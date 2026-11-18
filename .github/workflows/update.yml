@@ -1,0 +1,28 @@
+name: Update sessions
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fetch sessions
+        env:
+          ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
+          ZOHO_CLIENT_SECRET: ${{ secrets.ZOHO_CLIENT_SECRET }}
+          ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
+          ZOHO_ZSOID: ${{ secrets.ZOHO_ZSOID }}
+        run: node fetch-sessions.js
+      - name: Save changes
+        run: |
+          git config user.name "sessions-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add sessions.json
+          git diff --staged --quiet || (git commit -m "Update sessions" && git push)
