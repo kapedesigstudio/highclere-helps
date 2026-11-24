@@ -83,6 +83,7 @@ async function main() {
     }
     return {
       topic: s.topic,
+      hostEmail: s.presenterEmail ?? null,
       startTime: s.startTime,
       startTimeMillis: positiveNumber(s.startTimeMillis),
       timezone: timezoneName(s.timezone),
