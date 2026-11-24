@@ -3,7 +3,8 @@
 The landing page is a static website. Zoho credentials are used only by GitHub
 Actions to create the public webinar feed; the website server does not need them.
 
-The flow is: GitHub Secrets -> GitHub Actions -> public sessions.json -> website.
+The flow is: GitHub Secrets -> GitHub Actions -> public sessions.json on GitHub ->
+the visitor's browser. The page reads the public GitHub feed directly.
 
 ## 1. Add secrets in GitHub
 
@@ -48,8 +49,9 @@ upload this outer Downloads folder, private environment files, or the ZIP as cod
 The prepared workflow runs on changes to the website on `main`, on its roughly
 15-minute schedule, and manually. It fetches Zoho webinars, builds the public
 folder, saves a `landing-page` download under the workflow run's **Artifacts**,
-and commits `sessions.json` back to the default branch. It does not yet upload
-anything to a hosting server. The Actions token must be allowed to write repository
+and commits `sessions.json` back to the default branch. The page reads that public
+file directly, so data updates need no server upload. The workflow does not deploy
+HTML or JavaScript changes to the server. The Actions token must be allowed to write repository
 contents; protected branches may require a different feed storage approach.
 
 ## 3. Upload only the public files
@@ -71,7 +73,8 @@ sessions.json
 For example, `/public_html/highclere-helps/` might serve
 `https://your-domain.example/highclere-helps/`. Your host must confirm the actual
 mapping. The server only needs static-file hosting over HTTPS; Node.js is not
-required there. Keep `sessions.json` caching short so updates become visible.
+required there. The bundled `sessions.json` is a snapshot; the page's current
+configuration reads the maintained public feed on GitHub instead.
 
 Everything served to a browser is public. The Zoho registration links and public
 Forms submission URL are intended to be visible. Never put an OAuth access token,
@@ -81,37 +84,42 @@ server access rule, so do not upload the repository or `.env.local` to the web r
 The builder copies only the three listed files and rejects unexpected existing
 files in `dist/` rather than silently including them in an upload.
 
-## 4. Connect automatic server uploads
+## 4. Automatic webinar updates
 
-The server upload step needs the hosting provider, upload method (for example
-SFTP/SSH or the provider's deployment integration), server hostname/port, exact
-landing-page directory, and intended public URL. Obtain these from the host.
+`sessions.js` reads:
 
-For SFTP, use an account restricted to this landing page where possible. Store
-its private SSH key/password in additional GitHub Actions secrets. Obtain the
-server's SSH host key/fingerprint through the hosting control panel or provider
-and verify it when connecting. Keep the private key out of GitHub source and the
-public upload. Hostnames and destination paths can use Actions variables.
+```text
+https://raw.githubusercontent.com/kapedesigstudio/highclere-helps/main/sessions.json
+```
 
-Add the upload immediately after the public-package step in the **same workflow**,
-so successful scheduled refreshes also reach the server. Upload only `dist/` and
-preserve unrelated server files. Uploading once does not keep the live feed fresh.
-Commits made with `GITHUB_TOKEN` do not trigger another workflow run or a Pages
-build, so a separate push-only deploy workflow is not sufficient for this feed.
+This repository and JSON file must remain public. The browser needs no GitHub or
+Zoho token. Never add a private-repository token or OAuth secret to this script.
 
-GitHub Pages is another possible static host, but it needs its own Pages artifact
-and deployment step in this workflow. The generic `landing-page` artifact is a
-downloadable upload package, not a published site.
+The HTML versions its script URL (`sessions.js?v=20261124-2`) so browsers load
+the updated feed configuration. Upload both HTML and JavaScript together; change
+that version when making future script changes.
+
+After uploading the updated `sessions.js` once, every successful workflow refresh
+can reach the hosted page without uploading JSON to A2. The page loads the feed
+on opening and polls every five minutes. GitHub's raw-file endpoint currently
+caches responses for up to five minutes, so updates are not instantaneous.
+
+Deploy HTML/JavaScript changes to A2 when the code changes. The generic
+`landing-page` artifact is a downloadable upload package, not a published site.
+If a server Content Security Policy restricts external connections, it must
+allow this public feed under `connect-src`. The feed was checked with the
+`https://zogenie.com` origin and returns `Access-Control-Allow-Origin: *`.
 
 ## 5. Verify the live page
 
 1. Run the workflow manually under **Actions** and confirm it succeeds.
-2. Open the landing-page URL and its sibling `sessions.js` and `sessions.json` URLs.
-3. Confirm the live JSON's `updated` timestamp changes after an automatic upload.
-4. Check a future webinar's Eastern date/time and registration link. The bundled
-   snapshot contains only a past test webinar, so an empty upcoming list is expected
-   until a fresh feed includes a future event.
-5. Verify the production 1:1 form destination, mockup badge, and placeholder links
+2. Open the landing-page URL and its sibling `sessions.js` URL. Confirm the
+   hosted script points to the public GitHub feed above, then hard-refresh.
+3. Confirm that feed's `updated` timestamp changes after a successful workflow.
+   The sibling JSON on A2 is a snapshot and is no longer used by this script.
+4. Check a future webinar's Eastern date/time and registration link. Webinars
+   disappear once their scheduled start passes; use future events for testing.
+5. Verify the production 1:1 form destination and placeholder links
    before launch. The existing form is named `AngieTestforlandingpage`.
 
 Scheduled Actions can be delayed. Public-repository schedules are disabled after

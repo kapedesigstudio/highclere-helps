@@ -46,8 +46,8 @@ jobs:
           path: dist/
           if-no-files-found: error
           retention-days: 1
-      # Add the hosting provider's authenticated deployment step here.
-      # Upload only dist/; never upload this checkout or .env files.
+      # The page reads the public feed from GitHub; scheduled server uploads
+      # are unnecessary. Optional code deployment must upload only dist/.
       - name: Save changes
         run: |
           git config user.name "sessions-bot"

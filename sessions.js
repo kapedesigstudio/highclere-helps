@@ -1,8 +1,9 @@
 (function () {
   "use strict";
 
-  // Publish this script, index.html, and sessions.json in the same website folder.
-  var feedUrl = "./sessions.json";
+  // Webinar data is public. Zoho credentials stay in GitHub Actions.
+  // Read the maintained feed directly so hosted copies cannot become stale.
+  var feedUrl = "https://raw.githubusercontent.com/kapedesigstudio/highclere-helps/main/sessions.json";
   var displayTimezone = "America/Toronto";
   var list = document.getElementById("session-list");
   var title = document.getElementById("next-session-title");
