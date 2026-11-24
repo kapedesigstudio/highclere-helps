@@ -95,7 +95,7 @@ https://raw.githubusercontent.com/kapedesigstudio/highclere-helps/main/sessions.
 This repository and JSON file must remain public. The browser needs no GitHub or
 Zoho token. Never add a private-repository token or OAuth secret to this script.
 
-The HTML versions its script URL (`sessions.js?v=20261124-2`) so browsers load
+The HTML versions its script URL (`sessions.js?v=20261124-3`) so browsers load
 the updated feed configuration. Upload both HTML and JavaScript together; change
 that version when making future script changes.
 
@@ -109,6 +109,14 @@ Deploy HTML/JavaScript changes to A2 when the code changes. The generic
 If a server Content Security Policy restricts external connections, it must
 allow this public feed under `connect-src`. The feed was checked with the
 `https://zogenie.com` origin and returns `Access-Control-Allow-Origin: *`.
+
+## Host fields for filtering
+
+Each webinar includes `hostId` (Zoho's presenter ID as a string, or `null`)
+and `hostEmail` (the presenter's email, or `null`). These are public data in
+the feed, not credentials. The page preserves both fields when reading the feed.
+Use `hostId` for stable matching when adding a host filter. No host filter is
+enabled by default.
 
 ## 5. Verify the live page
 

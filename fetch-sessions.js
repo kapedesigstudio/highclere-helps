@@ -29,6 +29,14 @@ function positiveNumber(value) {
   return Number.isFinite(number) && number > 0 ? number : null;
 }
 
+function normalizeHostId(value) {
+  if (typeof value === "string") return value.trim() || null;
+  if (typeof value === "number" && Number.isSafeInteger(value) && value > 0) {
+    return String(value);
+  }
+  return null;
+}
+
 function timezoneName(value) {
   if (typeof value !== "string" || !value.trim()) return null;
   const name = value.trim();
@@ -83,6 +91,7 @@ async function main() {
     }
     return {
       topic: s.topic,
+      hostId: normalizeHostId(s.presenterZuid),
       hostEmail: s.presenterEmail ?? null,
       startTime: s.startTime,
       startTimeMillis: positiveNumber(s.startTimeMillis),

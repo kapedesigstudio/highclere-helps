@@ -13,6 +13,14 @@
   var sessions = [];
   var target = null;
 
+  function normalizeHostId(value) {
+    if (typeof value === "string") return value.trim() || null;
+    if (typeof value === "number" && Number.isSafeInteger(value) && value > 0) {
+      return String(value);
+    }
+    return null;
+  }
+
   function formatDate(millis, options) {
     return new Intl.DateTimeFormat("en-CA", Object.assign({
       timeZone: displayTimezone
@@ -116,6 +124,8 @@
           var millis = Number(session.startTimeMillis);
           return {
             topic: typeof session.topic === "string" ? session.topic : "Highclere Helps",
+            hostId: normalizeHostId(session.hostId),
+            hostEmail: typeof session.hostEmail === "string" ? session.hostEmail.trim() || null : null,
             startTime: typeof session.startTime === "string" ? session.startTime : "",
             startTimeMillis: Number.isFinite(millis) && millis > 0 ? millis : null,
             registrationLink: url.href
