@@ -1,8 +1,9 @@
 {
-  "updated": "2026-11-24T15:50:53.895Z",
+  "updated": "2026-11-24T16:07:12.694Z",
   "sessions": [
     {
       "topic": "Test",
+      "hostEmail": "matthew.usling@highclere.ca",
       "startTime": "Nov 24, 2026 11:00 AM EST",
       "startTimeMillis": 1795536000000,
       "timezone": "America/Toronto",
@@ -11,8 +12,9 @@
     },
     {
       "topic": "Tets 2",
-      "startTime": "Nov 24, 2026 11:00 AM EST",
-      "startTimeMillis": 1795536000000,
+      "hostEmail": "matthew.usling@highclere.ca",
+      "startTime": "Dec 15, 2026 11:00 AM EST",
+      "startTimeMillis": 1797350400000,
       "timezone": "America/Toronto",
       "duration": 3600000,
       "registrationLink": "https://meet.zohocloud.ca/tjxc-irp-jlv"
