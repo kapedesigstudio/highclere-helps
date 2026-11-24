@@ -1,8 +1,9 @@
 {
-  "updated": "2026-11-24T16:11:37.412Z",
+  "updated": "2026-11-24T16:15:48.761Z",
   "sessions": [
     {
       "topic": "Test",
+      "hostId": "110001797714",
       "hostEmail": "matthew.usling@highclere.ca",
       "startTime": "Nov 29, 2026 11:00 AM EST",
       "startTimeMillis": 1795968000000,
@@ -12,6 +13,7 @@
     },
     {
       "topic": "Tets 2",
+      "hostId": "110001797714",
       "hostEmail": "matthew.usling@highclere.ca",
       "startTime": "Dec 15, 2026 11:00 AM EST",
       "startTimeMillis": 1797350400000,
