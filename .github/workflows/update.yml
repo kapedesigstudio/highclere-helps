@@ -1,18 +1,35 @@
-name: Update sessions
+name: Update sessions and prepare landing page
 on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "sessions.js"
+      - "sessions.json"
+      - "fetch-sessions.js"
+      - "build-site.js"
+      - ".github/workflows/update.yml"
   schedule:
     - cron: "*/15 * * * *"
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
+concurrency:
+  group: landing-page-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   update:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
+          package-manager-cache: false
       - name: Fetch sessions
         env:
           ZOHO_CLIENT_ID: ${{ secrets.ZOHO_CLIENT_ID }}
@@ -20,9 +37,23 @@ jobs:
           ZOHO_REFRESH_TOKEN: ${{ secrets.ZOHO_REFRESH_TOKEN }}
           ZOHO_ZSOID: ${{ secrets.ZOHO_ZSOID }}
         run: node fetch-sessions.js
+      - name: Prepare public files only
+        run: node build-site.js
+      - name: Save public upload package
+        uses: actions/upload-artifact@v7
+        with:
+          name: landing-page
+          path: dist/
+          if-no-files-found: error
+          retention-days: 1
+      # Add the hosting provider's authenticated deployment step here.
+      # Upload only dist/; never upload this checkout or .env files.
       - name: Save changes
         run: |
           git config user.name "sessions-bot"
           git config user.email "actions@users.noreply.github.com"
           git add sessions.json
-          git diff --staged --quiet || (git commit -m "Update sessions" && git push)
+          if ! git diff --staged --quiet; then
+            git commit -m "Update sessions"
+            git push
+          fi
